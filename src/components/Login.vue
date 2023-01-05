@@ -70,12 +70,12 @@
 
       const onFinish = (values : any) => {
         context.emit('login',formState);
-        console.log('Success:', values);
+        console.log('Login: Success:', values);
       };
 
       const onFinishFailed = (errorInfo : any) => {
         // context.emit('finishFailed');
-        console.log('Failed:', errorInfo);
+        console.log('Login: Failed:', errorInfo);
       };
 
       const onCreateNewUser = () => {

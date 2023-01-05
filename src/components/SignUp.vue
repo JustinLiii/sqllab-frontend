@@ -32,7 +32,7 @@
       </a-form-item>
       <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
         <a-button type="primary" html-type="submit">注册</a-button>
-        <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+        <a-button style="margin-left: 10px" @click="goback">返回</a-button>
       </a-form-item>
     </a-form>
   </template>
@@ -57,7 +57,7 @@
       LockOutlined,
     },
 
-    emits: ['signup'],
+    emits: ['signup','go-back'],
 
     setup(props,context) {
 
@@ -109,8 +109,8 @@
         console.log(errors);
       };
 
-      const resetForm = () => {
-        formRef.value.resetFields();
+      const goback = () => {
+        context.emit('signup');
       };
 
       const handleValidate = (...args : any[]) => {
@@ -126,7 +126,7 @@
         LockOutlined,
         handleFinishFailed,
         handleFinish,
-        resetForm,
+        goback,
         handleValidate,
       };
     },
