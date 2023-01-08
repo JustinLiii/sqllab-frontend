@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// import HelloWorld from './components/HelloWorld.vue'
-// import TheWelcome from './components/TheWelcome.vue'
 import Login from './components/Login.vue'
 import SignUp from './components/SignUp.vue'
 import Main from './components/Main.vue'
-import EventList from './components/EventList.vue'
 import {ref} from 'vue'
 import axios from 'axios';
+import { message } from 'ant-design-vue';
 
 const backendUrl:string = "http://localhost:8001/api/db";
 
@@ -56,6 +54,47 @@ function HandleLogging(LogForm : any){
 
 function HandleSignUp(SignUpForm : any){
   console.log("qaq");
+  axios({
+    method:'post',
+    url:backendUrl,
+    data: {
+      header:'CheckSignUp',
+      user: {
+        name:SignUpForm.username,
+        passwd:SignUpForm.pass,
+        admin:SignUpForm.admin,
+      }
+    },
+  })
+  .then((response: any)=>{
+    console.log("signUp:"+response.data.result);
+    if(!response.data.result) {
+      message.error('用户已存在');
+      return;
+    }
+    axios({
+    method:'post',
+    url:backendUrl,
+    data: {
+      header:'SignUp',
+      user: {
+        name:SignUpForm.username,
+        passwd:SignUpForm.pass,
+        admin:SignUpForm.admin,
+      }
+    },
+  })
+  .then((response: any)=>{
+    message.success('注册成功');
+  })
+  .catch(err=>console.log(err));
+
+  })
+  .catch(err=>console.log(err));
+
+  
+
+  
   state.value=States.Logging;
 }
 

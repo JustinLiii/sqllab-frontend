@@ -1,13 +1,18 @@
 <template>
     <a-card  v-if="this.activity.active"  hoverable style="width: 300px" :tab-list="tabList" :title="this.activity.name" @tabChange="key => onTabChange(key)">
       <template #actions>
+        <div>  
+          <question-circle-outlined v-if="!this.activity.checked"/>
+          <check-circle-outlined v-else-if="this.activity.accepted"/>
+          <close-circle-outlined v-else/>
+        </div>
         <a-popconfirm
-          title="确定报名此活动？"
+          title="确定删除此申请？"
           ok-text="是"
           cancel-text="否"
           @confirm="confirm"
         >
-          <carry-out-outlined />
+          <delete-outlined />
         </a-popconfirm>
       </template>
 
@@ -25,10 +30,10 @@
     </a-card>
   </template>
   <script lang="ts">
-  import { CarryOutOutlined } from '@ant-design/icons-vue';
+  import { DeleteOutlined , CheckCircleOutlined , QuestionCircleOutlined , CloseCircleOutlined } from '@ant-design/icons-vue';
   import { defineComponent, ref } from 'vue';
-  import List from './List.vue';
   import { message } from 'ant-design-vue';
+  import List from './List.vue';
   function printDateTime(timestamp:number) : String{
         let date = new Date(timestamp);
         return date.getFullYear() + "年" + (date.getMonth()+1) + "月" + date.getDate() + "日 " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
@@ -38,10 +43,13 @@
         activity:Object
     },
     components: {
-      CarryOutOutlined,
+      DeleteOutlined,
+      CheckCircleOutlined,
+      QuestionCircleOutlined,
+      CloseCircleOutlined,
       List,
     },
-    emits:['apply'],
+    emits: ['refresh'],
     computed:{
       description(){
         return [
@@ -87,9 +95,9 @@
       const printDateAndTime = printDateTime;
       const key = ref('description');
       const confirm = (e: MouseEvent)=>{
-        context.emit('apply',props.activity.id);
-        message.success('成功注册');
-      }
+        message.success('Click on Yes');
+        context.emit('refresh');
+      };
       const tabList = [
         {
           key: 'description',

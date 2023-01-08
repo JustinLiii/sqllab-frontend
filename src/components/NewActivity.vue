@@ -60,18 +60,20 @@
     <a-form
       ref="formRef"
       name="custom-validation"
+      :model="formState"
     >
       <a-form-item label="名称" name="name" :rules="[{ required: true}]">
-        <a-input/>
+        <a-input v-model:value="formState['name']"/>
       </a-form-item>
       <a-form-item name="description" label="介绍" :rules="[{ required: true}]">
-        <a-textarea/>
+        <a-textarea v-model:value="formState['description']"/>
       </a-form-item>
       <a-form-item name="range-time-picker" label="持续时间" v-bind="config">
         <a-range-picker
           show-time
           format="YYYY-MM-DD HH:mm:ss"
           value-format="YYYY-MM-DD HH:mm:ss"
+          v-model:value="formState['time']"
         />
       </a-form-item>
       <a-form-item name="deadline-picker" label="报名截止时间" v-bind="rangeConfig">
@@ -79,45 +81,63 @@
           show-time
           format="YYYY-MM-DD HH:mm:ss"
           value-format="YYYY-MM-DD HH:mm:ss"
+          v-model:value="formState['deadline']"
         />
       </a-form-item>
       <a-form-item name="address" label="地址" :rules="[{ required: true}]">
-        <a-textarea/>
+        <a-textarea v-model:value="formState['address']"/>
       </a-form-item>
       <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
-        <!-- <a-button type="primary" html-type="submit">保存</a-button>
-        <a-button style="margin-left: 10px" >返回</a-button> -->
+      </a-form-item>
+      <a-form-item label="需求人数" name="needed-person">
+        <a-input-number v-model:value="formState['person_needed']" />
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
 
 <script lang="ts">
+import { ref, reactive } from 'vue';
 import { message } from 'ant-design-vue';
+import type { FormInstance } from 'ant-design-vue';
+
+interface FormState {
+  'name':string;
+  'time':[string,string];
+  'deadline':string;
+  'person_needed':number;
+  'description':string;
+  'address':string;
+}
+
 export default({
   props: {
     visiable:Boolean
   },
-  emits: ['finished'],
+  emits: ['finished','canceled'],
   setup(props,context) {
     const config = {
-      rules: [{ type: 'string' as const, required: true, message: 'Please select time!' }],
+      rules: [{ type: 'string' as const}],
     };
     const rangeConfig = {
-      rules: [{ type: 'array' as const, required: true, message: 'Please select time!' }],
+      rules: [{ type: 'array' as const}],
     };
     const handleFinish = ()=>{
+      context.emit("finished",formState);
       message.success("活动已创建");
-      context.emit("finished");
     }
     const handleCancel = ()=> {
-      handleFinish();
+      context.emit("canceled");
     }
+    const formRef = ref<FormInstance>();
+    const formState = reactive({} as FormState);
     return {
       config,
       rangeConfig,
       handleFinish,
       handleCancel,
+      formRef,
+      formState,
     };
   }
 });

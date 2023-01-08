@@ -1,21 +1,26 @@
 <template>
-    <a-card  v-if="this.activity.active"  hoverable style="width: 300px" :tab-list="tabList" :title="this.activity.name" @tabChange="key => onTabChange(key)">
+    <a-card 
+      v-if="this.activity.active"
+      hoverable
+      style="width: 300px"
+      :tab-list="tabList"
+      :title="this.activity.name"
+      @tabChange="key => onTabChange(key)"
+      >
       <template #actions>
         <a-popconfirm
-          title="确定报名此活动？"
+          title="确定删除此活动？"
           ok-text="是"
           cancel-text="否"
           @confirm="confirm"
         >
-          <carry-out-outlined />
+          <delete-outlined />
         </a-popconfirm>
+        <team-outlined @click="showPersonalOnlyChecked"/>
+        <ellipsis-outlined @click="showPersonal"/>
+        
       </template>
 
-      <!-- <div >
-        <p>{{ this.activity.description }}</p>
-        <p style="color:var(--vt-c-text-light-2)">创建者： {{ this.activity.creator }}</p>
-        <p style="color:var(--vt-c-text-light-2)">修改时间： {{ printDateAndTime(this.activity.modified_time) }}</p>
-      </div> -->
       <List v-if="key==='description'" :datas="description"/>
       
       <List v-else-if="key==='time'" :datas="time"/>
@@ -25,10 +30,10 @@
     </a-card>
   </template>
   <script lang="ts">
-  import { CarryOutOutlined } from '@ant-design/icons-vue';
+  import { EllipsisOutlined , DeleteOutlined , TeamOutlined} from '@ant-design/icons-vue';
   import { defineComponent, ref } from 'vue';
-  import List from './List.vue';
   import { message } from 'ant-design-vue';
+  import List from './List.vue';
   function printDateTime(timestamp:number) : String{
         let date = new Date(timestamp);
         return date.getFullYear() + "年" + (date.getMonth()+1) + "月" + date.getDate() + "日 " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
@@ -38,10 +43,12 @@
         activity:Object
     },
     components: {
-      CarryOutOutlined,
+      EllipsisOutlined,
+      DeleteOutlined,
+      TeamOutlined,
       List,
     },
-    emits:['apply'],
+    emits: ['refresh', 'showPerson',"deleteActivity"],
     computed:{
       description(){
         return [
@@ -87,9 +94,17 @@
       const printDateAndTime = printDateTime;
       const key = ref('description');
       const confirm = (e: MouseEvent)=>{
-        context.emit('apply',props.activity.id);
-        message.success('成功注册');
-      }
+        context.emit('deleteActivity',props.activity.id);
+        message.success('已删除');
+        context.emit('refresh');
+      };
+      const showPersonal=()=>{
+        console.log('show person list');
+        context.emit('showPerson', props.activity.id, false);
+      };
+      const showPersonalOnlyChecked=()=>{
+        context.emit('showPerson', props.activity.id, true);
+      };
       const tabList = [
         {
           key: 'description',
@@ -107,11 +122,13 @@
       return {
         key,
         tabList,
+        showPersonal,
+        showPersonalOnlyChecked,
         confirm,
         onTabChange,
         printDateAndTime,
       }
-    }
+    },
   });
   </script>
   

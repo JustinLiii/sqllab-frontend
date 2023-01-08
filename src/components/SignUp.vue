@@ -30,6 +30,15 @@
           </template>
         </a-input>
       </a-form-item>
+
+      
+      <a-form-item>
+        <a-form-item name="remember" no-style>
+          <a-checkbox v-model:checked="formState.admin">管理员</a-checkbox>
+        </a-form-item>
+      </a-form-item>
+
+
       <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
         <a-button type="primary" html-type="submit">注册</a-button>
         <a-button style="margin-left: 10px" @click="goback">返回</a-button>
@@ -66,7 +75,7 @@
         username: '',
         pass: '',
         checkPass: '',
-        admin: false,
+        admin: true,
       });
 
       let validatePass = async (_rule: Rule, value: string) => {
