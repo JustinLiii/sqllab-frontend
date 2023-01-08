@@ -26,20 +26,10 @@
           <a-menu-item key="5">{{menuItems['5']}}</a-menu-item>
           <a-menu-item key="6">{{menuItems['6']}}</a-menu-item>
         </a-sub-menu>
-        <!-- <a-sub-menu key="sub2">
-          <template #title>
-            <span>
-              <team-outlined />
-              <span>Team</span>
-            </span>
-          </template>
-          <a-menu-item key="6">Team 1</a-menu-item>
-          <a-menu-item key="8">Team 2</a-menu-item>
-        </a-sub-menu>
-        <a-menu-item key="9">
-          <file-outlined />
-          <span>File</span>
-        </a-menu-item> -->
+        <a-menu-item key="7">
+          <desktop-outlined />
+          <span>{{menuItems['7']}}</span>
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -49,7 +39,7 @@
           <a-breadcrumb-item v-for="key in selectedKeys">{{menuItems[key]}}</a-breadcrumb-item>
         </a-breadcrumb>
         <div :style="{ padding: '24px', background: '#fff', minHeight: '360px' }">
-          <div v-if="selectedKeys[0] == '1'">
+          <div v-if="selectedKeys[0] === '1'">
             <a-descriptions
               :title=this.currentUser.name
               bordered
@@ -58,6 +48,18 @@
               <a-descriptions-item label="管理员">{{yesNo}}</a-descriptions-item>
             </a-descriptions>
           </div>
+          <div v-else-if="selectedKeys[0] === '2'" style="display: flex; align-items:center">
+            <Card v-for="activity in activityList" :activity="activity" style="margin:0 10px" />
+            <a-button type="primary" shape="circle" size="large" @click="()=>NewActivityData.visiable=true">
+              <template #icon>
+                <plus-outlined />
+              </template>
+            </a-button>
+          </div>
+          <div v-else-if="selectedKeys[0] === '3'" style="display: flex;">
+            <Card v-for="activity in activityList" :activity="activity" style="margin:0 10px"/>
+          </div>
+          <NewActivity :visiable="NewActivityData.visiable" @finished="()=>NewActivityData.visiable=false"/>
         </div>
       </a-layout-content>
       <a-layout-footer style="text-align: center">
@@ -74,9 +76,13 @@ import {
   UserOutlined,
   TeamOutlined,
   FileOutlined,
+  PlusOutlined,
 } from '@ant-design/icons-vue';
 import { defineComponent, ref } from 'vue';
-import { object } from 'vue-types';
+import axios from 'axios';
+import Card from './Card.vue';
+import NewActivity from './NewActivity.vue';
+
 export default defineComponent({
   components: {
     PieChartOutlined,
@@ -84,9 +90,49 @@ export default defineComponent({
     UserOutlined,
     TeamOutlined,
     FileOutlined,
+    PlusOutlined,
+    Card,
+    NewActivity,
   },
   props: {
-    currentUser : object
+    currentUser : Object,
+    backendUrl : String,
+  },
+
+  watch: {
+    selectedKeys(newSelectedKeys){
+      if (newSelectedKeys[0]==='2') {
+        console.log(this.currentUser);
+        axios({
+          method:'post',
+          url:this.backendUrl,
+          data: {
+            header:'CreatedActivity',
+            user: {
+              name:this.currentUser.name,
+              admin:this.currentUser.admin,
+            }
+          }
+        })
+        .then((response: any)=>{
+          this.activityList = response.data.activities;
+        })
+        .catch(err=>console.log(err));
+      } else if (newSelectedKeys[0]==='3') {
+        console.log(this.currentUser);
+        axios({
+          method:'post',
+          url:this.backendUrl,
+          data: {
+            header:'AllActivity',
+          }
+        })
+        .then((response: any)=>{
+          this.activityList = response.data.activities;
+        })
+        .catch(err=>console.log(err));
+      }
+    }
   },
 
   computed: {
@@ -108,17 +154,22 @@ export default defineComponent({
       '4':'已通过的活动',
       '5':'被拒绝的活动',
       '6':'全部活动',
+      '7':'发布活动',
     };
     const menuItems = ref(qwq);
-
+    const NewActivityData = ref({
+      visiable:false,
+    })
 
     return {
-      menuItems
+      menuItems,
+      NewActivityData
     };
   },
   
   data() {
     return {
+      activityList: ref<object[]>(),
       collapsed: ref<boolean>(false),
       selectedKeys: ref<string[]>(['1']),
     };

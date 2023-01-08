@@ -63,16 +63,16 @@ function HandleSignUp(SignUpForm : any){
 
 <template>
 
-  <login-and-signup class="login-and-signup" v-if="state==States.Logging || state==States.SignUp">
+  <div class="login-and-signup" v-if="state==States.Logging || state==States.SignUp">
     <header >
       <img alt="Site logo" class="logo" src="./assets/LOGO_5120.png" width="125" height="125" />
     </header>
 
     <Login v-if="state == States.Logging" @login="HandleLogging" @createNewUser="()=>state=States.SignUp"/>
     <SignUp v-else-if="state == States.SignUp" @signup="HandleSignUp" @go-back="()=>state=States.Logging"/>
-  </login-and-signup>
+  </div>
 
-  <Main :currentUser="currentUser" v-else-if="state == States.Main"/>
+  <Main :currentUser="currentUser" :backendUrl="backendUrl" v-else-if="state == States.Main"/>
 </template>
 
 <style scoped>
